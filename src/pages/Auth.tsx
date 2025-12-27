@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Cake, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { z } from 'zod';
 
@@ -15,6 +16,8 @@ const passwordSchema = z.string().min(6, 'Password must be at least 6 characters
 
 const Auth = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { login, signup, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -29,6 +32,13 @@ const Auth = () => {
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [signupErrors, setSignupErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({});
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,14 +58,22 @@ const Auth = () => {
 
     setIsLoading(true);
     
-    // Simulate login - will be replaced with real auth
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await login(loginEmail, loginPassword);
       toast({
-        title: 'Login functionality requires backend',
-        description: 'Enable Lovable Cloud to add authentication.',
+        title: 'Welcome back!',
+        description: 'You have successfully logged in.',
       });
-    }, 1000);
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: 'Login failed',
+        description: error instanceof Error ? error.message : 'Invalid credentials',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -82,14 +100,22 @@ const Auth = () => {
 
     setIsLoading(true);
     
-    // Simulate signup - will be replaced with real auth
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await signup(signupName, signupEmail, signupPassword);
       toast({
-        title: 'Signup functionality requires backend',
-        description: 'Enable Lovable Cloud to add authentication.',
+        title: 'Account created!',
+        description: 'Welcome to Sweet Celebrations.',
       });
-    }, 1000);
+      navigate('/dashboard');
+    } catch (error) {
+      toast({
+        title: 'Signup failed',
+        description: error instanceof Error ? error.message : 'Could not create account',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

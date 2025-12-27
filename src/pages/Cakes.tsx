@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '@/components/layout/Layout';
 import { CakeCard } from '@/components/cakes/CakeCard';
-import { cakes, Cake } from '@/data/cakes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
+import { cakesService } from '@/services/cakesService';
+import { Cake } from '@/types';
 
 const categories: { value: Cake['category'] | 'all'; label: string }[] = [
   { value: 'all', label: 'All Cakes' },
@@ -18,12 +20,15 @@ const Cakes = () => {
   const [activeCategory, setActiveCategory] = useState<Cake['category'] | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredCakes = cakes.filter((cake) => {
-    const matchesCategory = activeCategory === 'all' || cake.category === activeCategory;
-    const matchesSearch = cake.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          cake.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['cakes', activeCategory, searchQuery],
+    queryFn: () => cakesService.getAll({
+      category: activeCategory === 'all' ? undefined : activeCategory,
+      search: searchQuery || undefined,
+    }),
   });
+
+  const cakes = data?.data || [];
 
   return (
     <Layout>
@@ -68,14 +73,34 @@ const Cakes = () => {
             </div>
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-16">
+              <p className="text-destructive mb-4">
+                Failed to load cakes. Please try again.
+              </p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+          )}
+
           {/* Results */}
-          {filteredCakes.length > 0 ? (
+          {!isLoading && !error && cakes.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCakes.map((cake) => (
-                <CakeCard key={cake.id} cake={cake} />
+              {cakes.map((cake) => (
+                <CakeCard key={cake._id} cake={cake} />
               ))}
             </div>
-          ) : (
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && cakes.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground">
                 No cakes found matching your criteria. Try adjusting your search or filters.

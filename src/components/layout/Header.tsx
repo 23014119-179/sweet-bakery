@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Cake, Menu, ShoppingBag, User } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useAuth } from '@/contexts/AuthContext';
+import { Cake, Menu, ShoppingBag, User, LogOut } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home' },
@@ -13,9 +15,16 @@ const navLinks = [
 
 export const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -49,12 +58,27 @@ export const Header = () => {
           <Button variant="ghost" size="icon">
             <ShoppingBag className="h-5 w-5" />
           </Button>
-          <Link to="/auth">
-            <Button variant="default">
-              <User className="h-4 w-4 mr-2" />
-              Sign In
-            </Button>
-          </Link>
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-3">
+              <Link to="/dashboard">
+                <Avatar className="h-8 w-8 cursor-pointer">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                    {user.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
+              <Button variant="ghost" size="icon" onClick={handleLogout}>
+                <LogOut className="h-5 w-5" />
+              </Button>
+            </div>
+          ) : (
+            <Link to="/auth">
+              <Button variant="default">
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Navigation */}
@@ -81,12 +105,34 @@ export const Header = () => {
                 </Link>
               ))}
               <hr className="my-4 border-border" />
-              <Link to="/auth" onClick={() => setIsOpen(false)}>
-                <Button className="w-full">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              </Link>
+              {isAuthenticated && user ? (
+                <>
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" className="w-full justify-start">
+                      <User className="h-4 w-4 mr-2" />
+                      {user.name}
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive" 
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

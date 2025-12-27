@@ -1,54 +1,48 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Clock, Package, Settings, ShoppingBag, User } from 'lucide-react';
+import { Clock, Package, Settings, ShoppingBag, User, Loader2 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { ordersService } from '@/services/ordersService';
+import { Order, Cake } from '@/types';
 
-// Mock data for demonstration
-const mockOrders = [
-  {
-    id: 'ORD-001',
-    cakeName: 'Classic Chocolate Dream',
-    date: '2024-01-15',
-    status: 'delivered',
-    total: 65.00,
-    size: '8 inch',
-    flavor: 'Dark Chocolate',
-  },
-  {
-    id: 'ORD-002',
-    cakeName: 'Vanilla Blossom',
-    date: '2024-01-20',
-    status: 'preparing',
-    total: 55.00,
-    size: '6 inch',
-    flavor: 'French Vanilla',
-  },
-  {
-    id: 'ORD-003',
-    cakeName: 'Rainbow Celebration',
-    date: '2024-01-25',
-    status: 'pending',
-    total: 75.00,
-    size: '10 inch',
-    flavor: 'Funfetti',
-  },
-];
-
-const statusColors: Record<string, string> = {
+const statusColors: Record<Order['status'], string> = {
   pending: 'bg-accent text-accent-foreground',
+  confirmed: 'bg-primary/80 text-primary-foreground',
   preparing: 'bg-primary text-primary-foreground',
+  ready: 'bg-secondary text-secondary-foreground',
   delivered: 'bg-secondary text-secondary-foreground',
+  cancelled: 'bg-destructive text-destructive-foreground',
 };
 
 const Dashboard = () => {
-  const mockUser = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    memberSince: 'January 2024',
+  const { user } = useAuth();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['orders'],
+    queryFn: () => ordersService.getAll(),
+  });
+
+  const orders = data?.data || [];
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
+
+  const getCakeName = (item: Order['items'][0]) => {
+    if (typeof item.cake === 'object' && item.cake !== null) {
+      return (item.cake as Cake).name;
+    }
+    return 'Cake';
   };
 
   return (
@@ -98,33 +92,38 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {mockOrders.length > 0 ? (
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : orders.length > 0 ? (
                     <div className="space-y-4">
-                      {mockOrders.map((order) => (
+                      {orders.map((order) => (
                         <div
-                          key={order.id}
+                          key={order._id}
                           className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border bg-card"
                         >
                           <div className="space-y-1 mb-4 sm:mb-0">
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-foreground">
-                                {order.cakeName}
+                                {order.items.length > 0 ? getCakeName(order.items[0]) : 'Order'}
+                                {order.items.length > 1 && ` +${order.items.length - 1} more`}
                               </span>
                               <Badge className={statusColors[order.status]}>
                                 {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                               </Badge>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                              {order.size} • {order.flavor}
+                              {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                             </p>
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Clock className="h-3 w-3" />
-                              {order.date}
+                              {formatDate(order.createdAt)}
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
                             <span className="text-lg font-bold text-primary">
-                              ${order.total.toFixed(2)}
+                              ${order.totalAmount.toFixed(2)}
                             </span>
                             <Button variant="outline" size="sm">
                               View Details
@@ -158,23 +157,27 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-20 w-20">
-                      <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-                        {mockUser.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h3 className="text-xl font-semibold text-foreground">
-                        {mockUser.name}
-                      </h3>
-                      <p className="text-muted-foreground">{mockUser.email}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Member since {mockUser.memberSince}
-                      </p>
-                    </div>
-                  </div>
-                  <Button variant="outline">Edit Profile</Button>
+                  {user && (
+                    <>
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-20 w-20">
+                          <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+                            {user.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h3 className="text-xl font-semibold text-foreground">
+                            {user.name}
+                          </h3>
+                          <p className="text-muted-foreground">{user.email}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Member since {formatDate(user.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <Button variant="outline">Edit Profile</Button>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '@/components/layout/Layout';
-import { getCakeById } from '@/data/cakes';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Minus, Plus, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Minus, Plus, ShoppingBag, Loader2 } from 'lucide-react';
+import { cakesService } from '@/services/cakesService';
 
 // Import all cake images
 import cakeChocolate from '@/assets/cake-chocolate.jpg';
@@ -30,15 +31,32 @@ const imageMap: Record<string, string> = {
 
 const CakeDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const cake = getCakeById(id || '');
   const { toast } = useToast();
+
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['cake', id],
+    queryFn: () => cakesService.getById(id!),
+    enabled: !!id,
+  });
+
+  const cake = data?.data;
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
   const [selectedFlavor, setSelectedFlavor] = useState('');
   const [message, setMessage] = useState('');
 
-  if (!cake) {
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container py-16 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error || !cake) {
     return (
       <Layout>
         <div className="container py-16 text-center">
@@ -71,6 +89,9 @@ const CakeDetails = () => {
     });
   };
 
+  // Get image path without extension for lookup
+  const imagePath = cake.image.replace('.jpg', '');
+
   return (
     <Layout>
       <section className="py-12 md:py-16">
@@ -87,7 +108,7 @@ const CakeDetails = () => {
             {/* Image */}
             <div className="relative aspect-square rounded-lg overflow-hidden bg-card">
               <img
-                src={imageMap[cake.image] || cakeChocolate}
+                src={imageMap[imagePath] || cakeChocolate}
                 alt={cake.name}
                 className="object-cover w-full h-full"
               />
@@ -146,20 +167,18 @@ const CakeDetails = () => {
               </div>
 
               {/* Custom Message */}
-              {cake.customizableOptions.canAddMessage && (
-                <div className="space-y-2">
-                  <Label>Custom Message (optional)</Label>
-                  <Textarea
-                    placeholder="Happy Birthday, John!"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    maxLength={50}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {message.length}/50 characters
-                  </p>
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label>Custom Message (optional)</Label>
+                <Textarea
+                  placeholder="Happy Birthday, John!"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  maxLength={50}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {message.length}/50 characters
+                </p>
+              </div>
 
               {/* Quantity */}
               <div className="space-y-2">
