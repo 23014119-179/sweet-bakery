@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Cake } from '@/data/cakes';
+import { Cake } from '@/types';
 import { ShoppingBag } from 'lucide-react';
 
 // Import all cake images
@@ -32,13 +32,17 @@ export const CakeCard = ({ cake }: CakeCardProps) => {
     wedding: 'bg-primary text-primary-foreground',
     custom: 'bg-secondary text-secondary-foreground',
     seasonal: 'bg-muted text-muted-foreground',
+    cupcakes: 'bg-accent text-accent-foreground',
   };
+
+  // Get image path without extension for lookup
+  const imagePath = cake.image.replace('.jpg', '');
 
   return (
     <Card className="overflow-hidden group hover:shadow-lg transition-all duration-300">
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={imageMap[cake.image] || cakeChocolate}
+          src={imageMap[imagePath] || cakeChocolate}
           alt={cake.name}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
         />
@@ -58,7 +62,7 @@ export const CakeCard = ({ cake }: CakeCardProps) => {
         </p>
       </CardContent>
       <CardFooter className="p-4 pt-0 gap-2">
-        <Link to={`/cakes/${cake.id}`} className="flex-1">
+        <Link to={`/cakes/${cake._id}`} className="flex-1">
           <Button variant="outline" className="w-full">
             View Details
           </Button>

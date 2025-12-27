@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { CakeCard } from '@/components/cakes/CakeCard';
-import { getFeaturedCakes } from '@/data/cakes';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { cakesService } from '@/services/cakesService';
 
 export const FeaturedCakes = () => {
-  const featuredCakes = getFeaturedCakes();
+  const { data, isLoading } = useQuery({
+    queryKey: ['cakes', 'featured'],
+    queryFn: () => cakesService.getFeatured(),
+  });
+
+  const featuredCakes = data?.data || [];
 
   return (
     <section className="py-16 md:py-24 bg-background">
@@ -20,11 +26,17 @@ export const FeaturedCakes = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {featuredCakes.slice(0, 6).map((cake) => (
-            <CakeCard key={cake.id} cake={cake} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-16">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {featuredCakes.slice(0, 6).map((cake) => (
+              <CakeCard key={cake._id} cake={cake} />
+            ))}
+          </div>
+        )}
 
         <div className="text-center">
           <Link to="/cakes">
