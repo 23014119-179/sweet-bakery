@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { Cake, Menu, ShoppingBag, User, LogOut } from 'lucide-react';
+import { Cake, Menu, ShoppingBag, User, LogOut, Shield } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home' },
@@ -60,6 +60,14 @@ export const Header = () => {
           </Button>
           {isAuthenticated && user ? (
             <div className="flex items-center gap-3">
+              {user.role === 'admin' && (
+                <Link to="/admin">
+                  <Button variant="outline" size="sm">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Link to="/dashboard">
                 <Avatar className="h-8 w-8 cursor-pointer">
                   <AvatarFallback className="bg-primary text-primary-foreground text-sm">
@@ -107,6 +115,14 @@ export const Header = () => {
               <hr className="my-4 border-border" />
               {isAuthenticated && user ? (
                 <>
+                  {user.role === 'admin' && (
+                    <Link to="/admin" onClick={() => setIsOpen(false)}>
+                      <Button variant="outline" className="w-full justify-start">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Panel
+                      </Button>
+                    </Link>
+                  )}
                   <Link to="/dashboard" onClick={() => setIsOpen(false)}>
                     <Button variant="outline" className="w-full justify-start">
                       <User className="h-4 w-4 mr-2" />
