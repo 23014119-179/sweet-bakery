@@ -67,18 +67,18 @@ export interface AuthResponse {
 export interface CakesResponse {
   success: boolean;
   count: number;
-  data: Cake[];
+  cakes: Cake[];
 }
 
 export interface CakeResponse {
   success: boolean;
-  data: Cake;
+  cake: Cake;
 }
 
 export interface OrdersResponse {
   success: boolean;
   count: number;
-  data: Order[];
+  orders: Order[];
 }
 
 export interface OrderResponse {

@@ -11,7 +11,7 @@ export const FeaturedCakes = () => {
     queryFn: () => cakesService.getFeatured(),
   });
 
-  const featuredCakes = data?.data || [];
+  const featuredCakes = data?.cakes || [];
 
   return (
     <section className="py-16 md:py-24 bg-background">

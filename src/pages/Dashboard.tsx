@@ -28,7 +28,7 @@ const Dashboard = () => {
     queryFn: () => ordersService.getAll(),
   });
 
-  const orders = data?.data || [];
+  const orders = data?.orders || [];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

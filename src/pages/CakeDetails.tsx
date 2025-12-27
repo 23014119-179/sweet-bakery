@@ -39,7 +39,7 @@ const CakeDetails = () => {
     enabled: !!id,
   });
 
-  const cake = data?.data;
+  const cake = data?.cake;
 
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');

@@ -28,7 +28,7 @@ const Cakes = () => {
     }),
   });
 
-  const cakes = data?.data || [];
+  const cakes = data?.cakes || [];
 
   return (
     <Layout>

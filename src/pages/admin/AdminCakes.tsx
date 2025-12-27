@@ -63,7 +63,7 @@ export default function AdminCakes() {
     queryFn: () => cakesService.getAll(),
   });
 
-  const cakes = cakesResponse?.data ?? [];
+  const cakes = cakesResponse?.cakes ?? [];
 
   const createMutation = useMutation({
     mutationFn: adminService.createCake,

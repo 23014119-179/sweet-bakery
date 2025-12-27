@@ -16,7 +16,7 @@ export default function AdminDashboard() {
     queryFn: () => adminService.getAllOrders(),
   });
 
-  const cakes = cakesResponse?.data ?? [];
+  const cakes = cakesResponse?.cakes ?? [];
 
   const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
   const pendingOrders = orders.filter((o) => o.status === 'pending').length;

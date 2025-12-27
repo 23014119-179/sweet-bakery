@@ -18,12 +18,12 @@ export const adminService = {
   // Cake management
   async createCake(data: CreateCakeData): Promise<Cake> {
     const response = await api.post<CakeResponse>('/api/cakes', data);
-    return response.data;
+    return response.cake;
   },
 
   async updateCake(id: string, data: UpdateCakeData): Promise<Cake> {
     const response = await api.put<CakeResponse>(`/api/cakes/${id}`, data);
-    return response.data;
+    return response.cake;
   },
 
   async deleteCake(id: string): Promise<void> {
@@ -34,7 +34,7 @@ export const adminService = {
   async getAllOrders(status?: string): Promise<Order[]> {
     const query = status ? `?status=${status}` : '';
     const response = await api.get<OrdersResponse>(`/api/orders${query}`);
-    return response.data;
+    return response.orders;
   },
 
   async updateOrderStatus(id: string, status: Order['status']): Promise<Order> {
