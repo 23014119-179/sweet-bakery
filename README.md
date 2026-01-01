@@ -1,73 +1,164 @@
-# Welcome to your Lovable project
+# Sweet Order Forge - E-Commerce Bakery Website
 
-## Project info
+## Project Description
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Sweet Order Forge is a full-stack e-commerce web application for a bakery, allowing users to browse and order a variety of cakes, pastries, and other sweets. The application provides a user-friendly interface, secure authentication, and smooth ordering experience, built using the MERN stack (MongoDB, Express, React, Node.js).
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+* **User Features:**
 
-**Use Lovable**
+  * Browse products with images and descriptions
+  * Add items to cart
+  * Secure user authentication and signup/login
+  * Checkout and order placement
+  * User dashboard for viewing orders
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+* **Admin Features:**
 
-Changes made via Lovable will be committed automatically to this repo.
+  * Admin panel to manage products
+  * View and manage user orders
 
-**Use your preferred IDE**
+* **Frontend Features:**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+  * Responsive design (mobile & desktop)
+  * Smooth navigation and transitions
+  * Dynamic product listing
+  * Customizable tab title and favicon
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+* **Backend Features:**
 
-Follow these steps:
+  * RESTful API endpoints for products, users, and orders
+  * MongoDB database for storing data
+  * JWT-based authentication
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+* **Frontend:** React, Tailwind CSS, Vite, Lucide Icons
+* **Backend:** Node.js, Express
+* **Database:** MongoDB (Atlas)
+* **Authentication:** JWT
+* **Deployment:** Vercel (Frontend), Render/Railway (Backend)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Folder Structure
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```
+project-root/
+├─ frontend/          # React frontend code
+│  ├─ public/         # Static files, favicon, index.html
+│  ├─ src/            # React components, pages, context
+│  ├─ package.json    # Frontend dependencies
+├─ backend/           # Node/Express backend
+│  ├─ models/         # MongoDB schemas
+│  ├─ routes/         # API routes
+│  ├─ controllers/    # Route logic
+│  ├─ server.js       # Main backend server
+│  ├─ package.json    # Backend dependencies
+├─ .gitignore
+└─ README.md
+```
+
+## Installation & Setup
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Umar-Tariq160/sweet-order-forge.git
+cd sweet-order-forge
+```
+
+### Backend Setup
+
+```bash
+cd backend
+npm install
+# Create a .env file with the following:
+# PORT=5000
+# MONGO_URI=your_mongodb_connection_string
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Backend will run on `http://localhost:5000`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Frontend Setup
 
-**Use GitHub Codespaces**
+```bash
+cd frontend
+npm install
+npm run dev  # For Vite development server
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Frontend will run on `http://localhost:5173` (or similar port shown in terminal).
 
-## What technologies are used for this project?
+### Environment Variables for Frontend
 
-This project is built with:
+* Create `.env` in frontend:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+VITE_API_URL=http://localhost:5000/api
+```
 
-## How can I deploy this project?
+## Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Frontend (Vercel)
 
-## Can I connect a custom domain to my Lovable project?
+1. Push the frontend to GitHub.
+2. Connect the repo to Vercel.
+3. Set the **Root Directory** to `frontend`.
+4. Set build command:
 
-Yes, you can!
+   * CRA: `npm run build`
+   * Vite: `npm run build`
+5. Set output directory:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+   * CRA: `build`
+   * Vite: `dist`
+6. Deploy → Site will be live at `https://your-project-name.vercel.app`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Backend (Render / Railway)
+
+1. Push backend code to GitHub.
+2. Create a new Web Service on Render or Railway.
+3. Connect the GitHub repo.
+4. Set environment variables:
+
+```
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+```
+
+5. Deploy → Backend URL will be like `https://sweet-bakery-backend.onrender.com`
+
+### Connect Frontend to Backend
+
+* Update frontend `.env`:
+
+```
+VITE_API_URL=https://sweet-bakery-backend.onrender.com/api
+```
+
+* Rebuild & redeploy frontend.
+
+## Usage
+
+1. Open the frontend URL in browser.
+2. Browse cakes, add items to cart.
+3. Signup/Login to place orders.
+4. Admin can login to manage products and orders.
+
+
+
+## Contribution
+
+1. Fork the repository.
+2. Create a new branch for your feature.
+3. Commit your changes.
+4. Push to your fork and create a pull request.
+
+## License
+
+This project is open-source and available under the MIT License.
+
+---
+
+**GitHub Repository:** [https://github.com/Umar-Tariq160/sweet-order-forge](https://github.com/Umar-Tariq160/sweet-order-forge)
